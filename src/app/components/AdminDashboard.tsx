@@ -55,8 +55,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [email, setEmail] = useState("bourainihad31@gmail.com");
-  const [password, setPassword] = useState("Nihed12345");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
