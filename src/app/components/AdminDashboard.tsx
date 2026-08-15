@@ -25,6 +25,7 @@ import {
   FileText
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 interface AdminDashboardProps {
   products: Product[];
@@ -52,9 +53,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onExitAdmin,
 }) => {
   // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Default true for seamless demo preview
-  const [email, setEmail] = useState("admin@maison-nb.dz");
-  const [password, setPassword] = useState("admin123");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Admin Active Tab
   const [activeTab, setActiveTab] = useState<"orders" | "products" | "categories" | "analytics">("orders");
@@ -84,11 +97,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Category Add Field
   const [newCatName, setNewCatName] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim() && password.trim()) {
-      setIsAuthenticated(true);
-      toast.success("مرحباً بك في لوحة تحكم MAISON NB");
+      setIsLoggingIn(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      setIsLoggingIn(false);
+
+      if (error) {
+        toast.error(error.message || "بيانات الدخول غير صحيحة");
+      } else {
+        toast.success("مرحباً بك في لوحة تحكم MAISON NB");
+      }
     } else {
       toast.error("يرجى إدخال بيانات الدخول");
     }
@@ -235,9 +258,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#1F1A17] text-[#D4AF37] font-bold rounded-xl text-sm hover:bg-[#B88A44] hover:text-white transition-all shadow-md"
+              disabled={isLoggingIn}
+              className="w-full py-3 bg-[#1F1A17] text-[#D4AF37] font-bold rounded-xl text-sm hover:bg-[#B88A44] hover:text-white transition-all shadow-md disabled:opacity-50"
             >
-              تسجيل الدخول
+              {isLoggingIn ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </button>
           </form>
 
@@ -284,7 +308,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
 
             <button
-              onClick={() => setIsAuthenticated(false)}
+              onClick={() => supabase.auth.signOut()}
               className="p-2 text-gray-400 hover:text-red-400 transition-colors"
               title="تسجيل الخروج"
             >

@@ -5,6 +5,7 @@ import { ProductGrid } from "./components/ProductGrid";
 import { LightboxModal } from "./components/LightboxModal";
 import { OrderModal } from "./components/OrderModal";
 import { AdminDashboard } from "./components/AdminDashboard";
+import { supabase } from "@/lib/supabase";
 import { Footer } from "./components/Footer";
 import {
   INITIAL_CATEGORIES,
@@ -65,6 +66,25 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dir = "rtl";
     document.documentElement.lang = "ar";
+  }, []);
+
+  // Fetch data from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: cats, error: catError } = await supabase.from('categories').select('*');
+        if (cats && !catError) setCategories(cats);
+
+        const { data: prods, error: prodError } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+        if (prods && !prodError) setProducts(prods);
+
+        const { data: ords, error: ordError } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+        if (ords && !ordError) setOrders(ords);
+      } catch (err) {
+        console.error("Supabase fetch error:", err);
+      }
+    };
+    fetchData();
   }, []);
 
   // Filter products by category and search term
@@ -178,7 +198,7 @@ export default function App() {
             ordersCount={orders.length}
           />
 
-          <main className="pt-4">
+          <main className="pt-[140px] sm:pt-[160px]">
             {/* Hero Section */}
             <HeroBanner />
 

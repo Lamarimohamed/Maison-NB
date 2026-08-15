@@ -24,7 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   ordersCount,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#B88A44]/20 shadow-xs">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#B88A44]/20 shadow-xs">
       {/* Top Announcement Bar */}
       <div className="bg-[#1F1A17] text-[#D4AF37] px-3 py-1.5 text-[11px] sm:text-xs text-center font-medium flex items-center justify-center gap-2">
         <span className="flex items-center gap-1.5">
