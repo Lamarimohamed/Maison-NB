@@ -59,13 +59,13 @@ CREATE POLICY "Allow public insert on orders" ON public.orders FOR INSERT WITH C
 
 -- Admin full access policies (restricted to the specific admin user ID)
 DROP POLICY IF EXISTS "Allow admin full access on categories" ON public.categories;
-CREATE POLICY "Allow admin full access on categories" ON public.categories FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+CREATE POLICY "Allow admin full access on categories" ON public.categories FOR ALL USING (auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99');
 
 DROP POLICY IF EXISTS "Allow admin full access on products" ON public.products;
-CREATE POLICY "Allow admin full access on products" ON public.products FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+CREATE POLICY "Allow admin full access on products" ON public.products FOR ALL USING (auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99');
 
 DROP POLICY IF EXISTS "Allow admin full access on orders" ON public.orders;
-CREATE POLICY "Allow admin full access on orders" ON public.orders FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+CREATE POLICY "Allow admin full access on orders" ON public.orders FOR ALL USING (auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99');
 
 -- Insert initial categories
 INSERT INTO public.categories (id, name) VALUES 
@@ -122,7 +122,7 @@ FOR INSERT
 TO authenticated
 WITH CHECK (
   bucket_id = 'product-images'
-  AND auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72'
+  AND auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99'
 );
 
 -- 2. Admin SELECT: Admin can view uploaded file metadata
@@ -132,7 +132,7 @@ FOR SELECT
 TO authenticated
 USING (
   bucket_id = 'product-images'
-  AND auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72'
+  AND auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99'
 );
 
 -- 3. Admin UPDATE: Admin can overwrite/replace files (upsert support)
@@ -142,11 +142,11 @@ FOR UPDATE
 TO authenticated
 USING (
   bucket_id = 'product-images'
-  AND auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72'
+  AND auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99'
 )
 WITH CHECK (
   bucket_id = 'product-images'
-  AND auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72'
+  AND auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99'
 );
 
 -- 4. Admin DELETE: Admin can delete uploaded images
@@ -156,7 +156,7 @@ FOR DELETE
 TO authenticated
 USING (
   bucket_id = 'product-images'
-  AND auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72'
+  AND auth.uid() = 'e596cfbf-fef1-4c34-b8fc-59152a561d99'
 );
 
 -- 5. Public READ: Everyone (storefront visitors) can view product images
