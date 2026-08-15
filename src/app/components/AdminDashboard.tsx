@@ -21,7 +21,9 @@ import {
   TrendingUp,
   LogOut,
   Search,
-  FileText
+  FileText,
+  Upload,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -92,6 +94,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [prodDesc, setProdDesc] = useState("");
   const [prodInStock, setProdInStock] = useState(true);
   const [prodIsFeatured, setProdIsFeatured] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Category Add Field
   const [newCatName, setNewCatName] = useState("");
@@ -194,6 +197,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setProdImageInput("");
       toast.success("تم إضافة رابط الصورة");
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    const uploadPromises = Array.from(files).map(async (file) => {
+      try {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from("product-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          toast.error(`فشل رفع الصورة: ${file.name}`);
+          return null;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(filePath);
+
+        return publicUrl;
+      } catch (err) {
+        console.error("Upload exception:", err);
+        toast.error(`خطأ في رفع الصورة: ${file.name}`);
+        return null;
+      }
+    });
+
+    const uploadedUrls = await Promise.all(uploadPromises);
+    const validUrls = uploadedUrls.filter((url): url is string => url !== null);
+    
+    if (validUrls.length > 0) {
+      setProdImages([...prodImages, ...validUrls]);
+      toast.success(`تم رفع ${validUrls.length} صورة بنجاح`);
+    }
+
+    setIsUploading(false);
+    e.target.value = "";
   };
 
   const handleAddCategorySubmit = (e: React.FormEvent) => {
@@ -796,32 +847,62 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-[#1F1A17]">روابط الصور (معاينة وتحكم)</label>
-                <div className="flex gap-2 mt-1">
+                <label className="font-bold text-[#1F1A17]">صور المنتج (رفع من الجهاز أو رابط)</label>
+                
+                <div className="mt-2">
+                  <label className={`flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                    isUploading
+                      ? "border-[#B88A44]/50 bg-[#F3ECE2]/50 cursor-not-allowed"
+                      : "border-[#B88A44]/30 bg-[#FAF8F5] hover:border-[#B88A44] hover:bg-[#F3ECE2]"
+                  }`}>
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 text-[#B88A44] animate-spin" />
+                        <span className="text-xs text-[#786F66] font-semibold">جاري الرفع...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 text-[#B88A44]" />
+                        <span className="text-xs text-[#1F1A17] font-semibold">اضغطي لرفع صور من جهازك</span>
+                        <span className="text-[10px] text-[#786F66]">(JPG, PNG, WebP - يمكنك اختيار عدة صور)</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <div className="flex gap-2 mt-3">
                   <input
                     type="url"
                     value={prodImageInput}
                     onChange={(e) => setProdImageInput(e.target.value)}
-                    placeholder="رابط صورة Unsplash أو رابط مباشر..."
-                    className="flex-1 p-2 border rounded-xl bg-[#FAF8F5]"
+                    placeholder="أو اكتبي رابط صورة مباشر هنا..."
+                    className="flex-1 p-2 border rounded-xl bg-[#FAF8F5] text-xs"
                   />
                   <button
                     type="button"
                     onClick={handleAddImageUrl}
-                    className="px-3 py-1 bg-[#1F1A17] text-[#D4AF37] font-bold rounded-xl"
+                    className="px-3 py-1 bg-[#1F1A17] text-[#D4AF37] font-bold rounded-xl text-xs"
                   >
                     إضافة
                   </button>
                 </div>
 
-                <div className="flex gap-2 mt-2 overflow-x-auto">
+                <div className="flex gap-2 mt-3 overflow-x-auto py-1">
                   {prodImages.map((img, idx) => (
-                    <div key={idx} className="relative w-16 h-20 rounded-lg overflow-hidden border shrink-0">
+                    <div key={idx} className="relative w-16 h-20 rounded-lg overflow-hidden border shrink-0 shadow-2xs">
                       <img src={img} alt="" className="w-full h-full object-cover" />
                       <button
                         type="button"
                         onClick={() => setProdImages(prodImages.filter((_, i) => i !== idx))}
-                        className="absolute top-0 right-0 bg-red-600 text-white p-0.5 rounded-bl-md"
+                        className="absolute top-0 right-0 bg-red-600/95 text-white p-0.5 rounded-bl-md hover:bg-red-700 transition-colors"
                       >
                         <XCircle className="w-3.5 h-3.5" />
                       </button>

@@ -25,7 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#B88A44]/20 shadow-xs">
+      <header className="relative w-full bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#B88A44]/20 shadow-xs">
         {/* Top Announcement Bar */}
         <div className="bg-[#1F1A17] text-[#D4AF37] px-3 py-1.5 text-[11px] sm:text-xs text-center font-medium flex items-center justify-center gap-2">
           <span className="flex items-center gap-1.5">
@@ -78,11 +78,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Left Side: Contact Link */}
             <div className="flex items-center gap-2">
               <a
-                href="tel:0550000000"
+                href="tel:0540297562"
                 className="flex items-center gap-1 text-[11px] sm:text-xs text-[#786F66] hover:text-[#B88A44] transition-colors"
               >
                 <Phone className="w-3.5 h-3.5 text-[#B88A44]" />
-                <span dir="ltr" className="font-mono hidden xs:inline">0550 00 00 00</span>
+                <span dir="ltr" className="font-mono hidden xs:inline">0540 29 75 62</span>
               </a>
             </div>
           </div>
@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Search Bar & Category Navigation — scrolls with the page */}
       {currentView === "store" && (
-        <div className="pt-[92px] sm:pt-[112px] bg-[#FAF8F5] border-b border-[#B88A44]/10">
+        <div className="bg-[#FAF8F5] border-b border-[#B88A44]/10">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-2.5 space-y-2.5">
             {/* Search Box */}
             <div className="relative max-w-xl mx-auto">

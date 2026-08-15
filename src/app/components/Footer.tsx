@@ -52,11 +52,11 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs text-[#D9D2C7]">
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#B88A44] shrink-0" />
-                <span dir="ltr">0550 00 00 00 / 0770 00 00 00</span>
+                <span dir="ltr">0540 29 75 62</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#B88A44] shrink-0" />
-                <span>contact@maison-nb.dz</span>
+                <span>maison.nb11@gmail.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#B88A44] shrink-0" />
@@ -72,7 +72,9 @@ export const Footer: React.FC = () => {
             </h3>
             <div className="flex items-center gap-3">
               <a
-                href="#"
+                href="https://www.instagram.com/maisonnbdz?igsh=MXR3Z24zejk4a3UxZQ%3D%3D&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#B88A44]/20 text-[#D4AF37] flex items-center justify-center hover:bg-[#B88A44] hover:text-[#1F1A17] transition-colors"
                 aria-label="Instagram"
               >
