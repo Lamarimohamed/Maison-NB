@@ -53,10 +53,10 @@ CREATE POLICY "Allow public read access on products" ON public.products FOR SELE
 -- Allow public to insert orders (unauthenticated users can place orders)
 CREATE POLICY "Allow public insert on orders" ON public.orders FOR INSERT WITH CHECK (true);
 
--- Admin full access policies (requires authenticated user)
-CREATE POLICY "Allow admin full access on categories" ON public.categories FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow admin full access on products" ON public.products FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Allow admin full access on orders" ON public.orders FOR ALL USING (auth.role() = 'authenticated');
+-- Admin full access policies (restricted to the specific admin user ID)
+CREATE POLICY "Allow admin full access on categories" ON public.categories FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+CREATE POLICY "Allow admin full access on products" ON public.products FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+CREATE POLICY "Allow admin full access on orders" ON public.orders FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
 
 -- Insert initial categories
 INSERT INTO public.categories (id, name) VALUES 
