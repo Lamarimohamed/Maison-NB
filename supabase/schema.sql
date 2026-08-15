@@ -47,15 +47,24 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access to categories and products
+DROP POLICY IF EXISTS "Allow public read access on categories" ON public.categories;
 CREATE POLICY "Allow public read access on categories" ON public.categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow public read access on products" ON public.products;
 CREATE POLICY "Allow public read access on products" ON public.products FOR SELECT USING (true);
 
 -- Allow public to insert orders (unauthenticated users can place orders)
+DROP POLICY IF EXISTS "Allow public insert on orders" ON public.orders;
 CREATE POLICY "Allow public insert on orders" ON public.orders FOR INSERT WITH CHECK (true);
 
 -- Admin full access policies (restricted to the specific admin user ID)
+DROP POLICY IF EXISTS "Allow admin full access on categories" ON public.categories;
 CREATE POLICY "Allow admin full access on categories" ON public.categories FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+
+DROP POLICY IF EXISTS "Allow admin full access on products" ON public.products;
 CREATE POLICY "Allow admin full access on products" ON public.products FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
+
+DROP POLICY IF EXISTS "Allow admin full access on orders" ON public.orders;
 CREATE POLICY "Allow admin full access on orders" ON public.orders FOR ALL USING (auth.uid() = 'dbfe96ca-fe4a-40c4-a53e-d02e12a2ba72');
 
 -- Insert initial categories
