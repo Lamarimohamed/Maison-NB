@@ -79,7 +79,9 @@ export const Footer: React.FC = () => {
                 <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="#"
+                href="https://web.facebook.com/Maisonnbdz"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#B88A44]/20 text-[#D4AF37] flex items-center justify-center hover:bg-[#B88A44] hover:text-[#1F1A17] transition-colors"
                 aria-label="Facebook"
               >

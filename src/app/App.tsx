@@ -198,7 +198,7 @@ export default function App() {
             ordersCount={orders.length}
           />
 
-          <main className="pt-[140px] sm:pt-[160px]">
+          <main>
             {/* Hero Section */}
             <HeroBanner />
 

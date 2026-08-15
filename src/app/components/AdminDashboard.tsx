@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Product, Category, Order, OrderStatus } from "@/data/initialData";
+import logoImg from "@/imports/photo_2026-08-14_21-39-31.jpg";
 import {
-  Lock,
   ShoppingBag,
   Package,
   FolderPlus,
@@ -20,7 +20,6 @@ import {
   DollarSign,
   TrendingUp,
   LogOut,
-  Sparkles,
   Search,
   FileText
 } from "lucide-react";
@@ -228,9 +227,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div className="min-h-screen bg-[#1F1A17] flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-[#FAF8F5] rounded-3xl p-8 shadow-2xl border border-[#B88A44]/30 space-y-6">
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 mx-auto rounded-full bg-[#1F1A17] text-[#D4AF37] flex items-center justify-center shadow-lg">
-              <Lock className="w-8 h-8" />
-            </div>
+            <img
+              src={logoImg}
+              alt="MAISON NB"
+              className="h-16 w-auto mx-auto object-contain rounded-md"
+            />
             <h2 className="text-2xl font-bold text-[#1F1A17]">لوحة تحكم MAISON NB</h2>
             <p className="text-xs text-[#786F66]">سجلي الدخول لمتابعة الطلبات وتعديل المنتجات</p>
           </div>
@@ -286,9 +287,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <header className="bg-[#1F1A17] text-[#FAF8F5] border-b border-[#B88A44]/30 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="p-2 bg-[#B88A44]/20 text-[#D4AF37] rounded-xl border border-[#D4AF37]/30">
-              <Sparkles className="w-5 h-5" />
-            </span>
+            <img
+              src={logoImg}
+              alt="MAISON NB"
+              className="h-10 w-auto object-contain rounded-md bg-white/10 p-1"
+            />
             <div>
               <h1 className="text-lg font-bold text-[#FAF8F5] flex items-center gap-2">
                 لوحة التحكم الإدارية
