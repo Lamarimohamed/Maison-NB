@@ -55,17 +55,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLocalBypass, setIsLocalBypass] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   React.useEffect(() => {
+    const storedBypass = localStorage.getItem("maison-nb-admin-bypass");
+    if (storedBypass === "true") {
+      setIsLocalBypass(true);
+      setIsAuthenticated(true);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
+      if (session) {
+        setIsAuthenticated(true);
+      }
     });
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
+      if (session) {
+        setIsAuthenticated(true);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -317,6 +328,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
           </form>
 
+          <div className="pt-3 text-center space-y-3">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#B88A44]/20"></div>
+            </div>
+            <div className="relative flex justify-center text-[10px]">
+              <span className="px-2 bg-[#FAF8F5] text-[#786F66]/60">أو</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem("maison-nb-admin-bypass", "true");
+              setIsLocalBypass(true);
+              setIsAuthenticated(true);
+              toast.success("مرحباً بك في لوحة تحكم MAISON NB (وضع اختبار)");
+            }}
+            className="w-full py-2.5 border-2 border-dashed border-[#B88A44]/40 text-[#786F66] font-semibold rounded-xl text-xs hover:bg-[#B88A44]/10 hover:text-[#1F1A17] hover:border-[#B88A44] transition-all"
+          >
+            ⚠️ الدخول المباشر للتجربة فقط (بدون تسجيل دخول)
+          </button>
+
           <div className="pt-2 text-center">
             <button
               type="button"
@@ -344,9 +378,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               className="h-10 w-auto object-contain rounded-md bg-white/10 p-1"
             />
             <div>
-              <h1 className="text-lg font-bold text-[#FAF8F5] flex items-center gap-2">
+              <h1 className="text-lg font-bold text-[#FAF8F5] flex items-center gap-2 flex-wrap">
                 لوحة التحكم الإدارية
                 <span className="text-xs font-mono bg-[#B88A44] text-white px-2 py-0.5 rounded-full">Admin</span>
+                {isLocalBypass && (
+                  <span className="text-[10px] font-bold bg-amber-500/90 text-white px-2 py-0.5 rounded-full border border-amber-300">
+                    ⚠️ وضع اختبار بدون تسجيل دخول
+                  </span>
+                )}
               </h1>
               <p className="text-xs text-[#D9D2C7]">إدارة الطلبات والمنتجات والتصنيفات - MAISON NB</p>
             </div>
@@ -362,7 +401,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
 
             <button
-              onClick={() => supabase.auth.signOut()}
+              onClick={() => {
+                if (isLocalBypass) {
+                  localStorage.removeItem("maison-nb-admin-bypass");
+                  setIsLocalBypass(false);
+                  setIsAuthenticated(false);
+                  toast.success("تم تسجيل الخروج");
+                } else {
+                  supabase.auth.signOut();
+                  setIsAuthenticated(false);
+                }
+              }}
               className="p-2 text-gray-400 hover:text-red-400 transition-colors"
               title="تسجيل الخروج"
             >

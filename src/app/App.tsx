@@ -1,3 +1,4 @@
+pp · TSX
 import React, { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar";
 import { HeroBanner } from "./components/HeroBanner";
@@ -17,7 +18,7 @@ import {
   OrderStatus,
 } from "@/data/initialData";
 import { Toaster, toast } from "sonner";
-
+ 
 export default function App() {
   const [currentView, setCurrentView] = useState<"store" | "admin">("store");
   
@@ -25,12 +26,12 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-
+ 
   // Search & Filters
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+ 
   // Lightbox Modal State
   const [lightboxState, setLightboxState] = useState<{
     isOpen: boolean;
@@ -43,7 +44,7 @@ export default function App() {
     initialIndex: 0,
     productName: "",
   });
-
+ 
   // Order Form Modal State
   const [orderModalState, setOrderModalState] = useState<{
     isOpen: boolean;
@@ -52,7 +53,7 @@ export default function App() {
     isOpen: false,
     product: null,
   });
-
+ 
   // Simulate skeleton loader when switching categories or searching
   useEffect(() => {
     setIsLoading(true);
@@ -61,23 +62,23 @@ export default function App() {
     }, 350);
     return () => clearTimeout(timer);
   }, [activeCategory]);
-
+ 
   // Set RTL direction on html
   useEffect(() => {
     document.documentElement.dir = "rtl";
     document.documentElement.lang = "ar";
   }, []);
-
+ 
   // Fetch data from Supabase
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data: cats, error: catError } = await supabase.from('categories').select('*');
         if (cats && !catError) setCategories(cats);
-
+ 
         const { data: prods, error: prodError } = await supabase.from('products').select('*').order('created_at', { ascending: false });
         if (prods && !prodError) setProducts(prods);
-
+ 
         const { data: ords, error: ordError } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
         if (ords && !ordError) setOrders(ords);
       } catch (err) {
@@ -86,7 +87,7 @@ export default function App() {
     };
     fetchData();
   }, []);
-
+ 
   // Filter products by category and search term
   const filteredProducts = products.filter((p) => {
     const matchesCategory = activeCategory === "all" || p.category_id === activeCategory;
@@ -97,17 +98,17 @@ export default function App() {
       p.sizes.some((s) => s.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
-
+ 
   const activeCategoryName =
     categories.find((c) => c.id === activeCategory)?.name || "الكل";
-
+ 
   // Lightbox Handler
   const handleOpenLightbox = (images: string[], index: number, name: string) => {
     // Increment view counter
     setProducts((prev) =>
       prev.map((p) => (p.name === name ? { ...p, views: p.views + 1 } : p))
     );
-
+ 
     setLightboxState({
       isOpen: true,
       images,
@@ -115,61 +116,109 @@ export default function App() {
       productName: name,
     });
   };
-
+ 
   // Order Modal Handler
   const handleOpenOrder = (product: Product) => {
     // Increment click counter
     setProducts((prev) =>
       prev.map((p) => (p.id === product.id ? { ...p, clicks: p.clicks + 1 } : p))
     );
-
+ 
     setOrderModalState({
       isOpen: true,
       product,
     });
   };
-
+ 
   // Submit Order Action
-  const handleSubmitOrder = (newOrder: Order) => {
+  const handleSubmitOrder = async (newOrder: Order) => {
+    const { error } = await supabase.from('orders').insert(newOrder);
+    if (error) {
+      console.error("Order insert error:", error);
+      toast.error("فشل إرسال الطلب");
+      return;
+    }
     setOrders((prev) => [newOrder, ...prev]);
   };
-
+ 
   // Admin Actions
-  const handleUpdateProduct = (updatedProduct: Product) => {
+  const handleUpdateProduct = async (updatedProduct: Product) => {
+    const { error } = await supabase
+      .from('products')
+      .update(updatedProduct)
+      .eq('id', updatedProduct.id);
+    if (error) {
+      console.error("Product update error:", error);
+      toast.error("فشل تحديث المنتج");
+      return;
+    }
     setProducts((prev) =>
       prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
     );
   };
-
-  const handleAddProduct = (newProd: Product) => {
+ 
+  const handleAddProduct = async (newProd: Product) => {
+    const { error } = await supabase.from('products').insert(newProd);
+    if (error) {
+      console.error("Product insert error:", error);
+      toast.error("فشل إضافة المنتج");
+      return;
+    }
     setProducts((prev) => [newProd, ...prev]);
   };
-
-  const handleDeleteProduct = (prodId: string) => {
+ 
+  const handleDeleteProduct = async (prodId: string) => {
+    const { error } = await supabase.from('products').delete().eq('id', prodId);
+    if (error) {
+      console.error("Product delete error:", error);
+      toast.error("فشل حذف المنتج");
+      return;
+    }
     setProducts((prev) => prev.filter((p) => p.id !== prodId));
   };
-
-  const handleAddCategory = (name: string) => {
+ 
+  const handleAddCategory = async (name: string) => {
     const id = name.toLowerCase().replace(/\s+/g, "-");
+    const { error } = await supabase.from('categories').insert({ id, name });
+    if (error) {
+      console.error("Category insert error:", error);
+      toast.error("فشل إضافة الفئة");
+      return;
+    }
     setCategories((prev) => [...prev, { id, name }]);
   };
-
-  const handleDeleteCategory = (catId: string) => {
+ 
+  const handleDeleteCategory = async (catId: string) => {
+    const { error } = await supabase.from('categories').delete().eq('id', catId);
+    if (error) {
+      console.error("Category delete error:", error);
+      toast.error("فشل حذف الفئة");
+      return;
+    }
     setCategories((prev) => prev.filter((c) => c.id !== catId));
     if (activeCategory === catId) setActiveCategory("all");
   };
-
-  const handleUpdateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
+ 
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+    if (error) {
+      console.error("Order status update error:", error);
+      toast.error("فشل تحديث حالة الطلب");
+      return;
+    }
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
     toast.success(`تم تحديث حالة الطلب ${orderId} إلى: ${newStatus}`);
   };
-
+ 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1F1A17] font-arabic antialiased selection:bg-[#B88A44] selection:text-white flex flex-col justify-between">
       <Toaster position="top-center" richColors dir="rtl" />
-
+ 
       {currentView === "admin" ? (
         /* Admin Dashboard View */
         <AdminDashboard
@@ -197,11 +246,11 @@ export default function App() {
             setCurrentView={setCurrentView}
             ordersCount={orders.length}
           />
-
+ 
           <main>
             {/* Hero Section */}
             <HeroBanner />
-
+ 
             {/* Catalog Grid */}
             <div id="product-catalog-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <ProductGrid
@@ -215,11 +264,11 @@ export default function App() {
               />
             </div>
           </main>
-
+ 
           <Footer />
         </div>
       )}
-
+ 
       {/* Lightbox Swipe / Zoom Modal */}
       <LightboxModal
         isOpen={lightboxState.isOpen}
@@ -228,7 +277,7 @@ export default function App() {
         initialIndex={lightboxState.initialIndex}
         productName={lightboxState.productName}
       />
-
+ 
       {/* On-Site Order Modal with 58 Wilayas + Communes */}
       <OrderModal
         isOpen={orderModalState.isOpen}
