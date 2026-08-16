@@ -337,6 +337,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <span className="px-2 bg-[#FAF8F5] text-[#786F66]/60">أو</span>
             </div>
           </div>
+          </div>
 
           <button
             type="button"
