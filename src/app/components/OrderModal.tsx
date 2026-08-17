@@ -26,6 +26,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
   const [communesList, setCommunesList] = useState<string[]>([]);
   const [address, setAddress] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [notes, setNotes] = useState("");
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,6 +54,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
   useEffect(() => {
     if (product && product.sizes.length > 0) {
       setSelectedSize(product.sizes[0]);
+    }
+    if (product && product.colors && product.colors.length > 0) {
+      setSelectedColor(product.colors[0]);
+    } else {
+      setSelectedColor("");
     }
     setIsSubmittedSuccess(false);
     setSubmittedOrder(null);
@@ -90,6 +96,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
       return;
     }
 
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      toast.error("يرجى اختيار اللون المطلوب");
+      return;
+    }
+
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -105,6 +116,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
         commune: selectedCommune,
         address: address.trim(),
         size: selectedSize || product.sizes[0] || "Standard",
+        color: selectedColor || undefined,
         notes: notes.trim(),
         status: "pending",
         created_at: new Date().toISOString(),
@@ -341,6 +353,31 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                     ))}
                   </div>
                 </div>
+
+                {/* 6b. Color Selector (only if product has defined colors) */}
+                {product.colors && product.colors.length > 0 && (
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-[#1F1A17]">
+                      اختر اللون المناسب <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {product.colors.map((col) => (
+                        <button
+                          type="button"
+                          key={col}
+                          onClick={() => setSelectedColor(col)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                            selectedColor === col
+                              ? "bg-[#1F1A17] text-[#D4AF37] border-[#1F1A17] shadow-md scale-105"
+                              : "bg-[#FAF8F5] text-[#1F1A17] border-[#B88A44]/30 hover:bg-[#F3ECE2]"
+                          }`}
+                        >
+                          {col}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* 7. Additional Notes */}
                 <div className="space-y-1.5">

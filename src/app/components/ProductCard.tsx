@@ -81,6 +81,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             ))}
           </div>
 
+          {/* Colors preview */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="text-[9px] sm:text-[10px] text-[#786F66] font-medium">الألوان:</span>
+              {product.colors.map((c) => (
+                <span key={c} className="text-[9px] sm:text-[10px] font-mono px-1 py-0.2 bg-[#F3ECE2] text-[#1F1A17] rounded">
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
+
           <h3
             onClick={() => onOpenLightbox(product.images, 0, product.name)}
             className="text-xs sm:text-base font-bold text-[#1F1A17] line-clamp-2 hover:text-[#B88A44] transition-colors cursor-pointer leading-snug"

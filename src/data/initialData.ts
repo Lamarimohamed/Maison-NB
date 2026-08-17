@@ -11,6 +11,8 @@ export interface Product {
   originalPrice?: number;
   category_id: string;
   sizes: string[];
+  size_type: "letter" | "number";
+  colors: string[];
   images: string[];
   description: string;
   in_stock: boolean;
@@ -34,6 +36,7 @@ export interface Order {
   commune: string;
   address: string;
   size: string;
+  color?: string;
   notes?: string;
   status: OrderStatus;
   created_at: string;
@@ -57,6 +60,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     originalPrice: 11200,
     category_id: "dresses",
     sizes: ["S", "M", "L", "XL"],
+    size_type: "letter",
+    colors: ["بيج", "أسود", "نبيتي"],
     images: [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800&fit=crop&auto=format",
@@ -76,6 +81,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     originalPrice: 14800,
     category_id: "abayas",
     sizes: ["Standard", "M", "L", "XL"],
+    size_type: "letter",
+    colors: ["أسود مطرز بالذهبي", "كحلي مطرز بالذهبي"],
     images: [
       "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&fit=crop&auto=format"
@@ -93,6 +100,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 4600,
     category_id: "blouses",
     sizes: ["S", "M", "L", "XL"],
+    size_type: "letter",
+    colors: ["كريمي", "أبيض"],
     images: [
       "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1551163943-3f6a855d1153?w=800&fit=crop&auto=format"
@@ -111,6 +120,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     originalPrice: 19500,
     category_id: "coats",
     sizes: ["S", "M", "L", "XL", "XXL"],
+    size_type: "letter",
+    colors: ["بني كشمير", "أسود"],
     images: [
       "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1548624149-f1af3462b86a?w=800&fit=crop&auto=format"
@@ -128,6 +139,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 7400,
     category_id: "dresses",
     sizes: ["S", "M", "L"],
+    size_type: "letter",
+    colors: ["بيج", "زيتي"],
     images: [
       "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&fit=crop&auto=format"
@@ -145,6 +158,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 5200,
     category_id: "pants",
     sizes: ["36", "38", "40", "42", "44"],
+    size_type: "number",
+    colors: ["أسود", "كحلي"],
     images: [
       "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?w=800&fit=crop&auto=format"
@@ -163,6 +178,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     originalPrice: 12000,
     category_id: "accessories",
     sizes: ["One Size"],
+    size_type: "letter",
+    colors: ["ذهبي", "أسود"],
     images: [
       "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&fit=crop&auto=format"
@@ -180,6 +197,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 18500,
     category_id: "abayas",
     sizes: ["S", "M", "L", "XL"],
+    size_type: "letter",
+    colors: ["أسود مرصع", "نبيتي مرصع"],
     images: [
       "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&fit=crop&auto=format"
@@ -206,6 +225,7 @@ export const INITIAL_ORDERS: Order[] = [
     commune: "حيدرة",
     address: "حي سعيد حمدين، عمارة 12، شقة 4",
     size: "M",
+    color: "بيج",
     notes: "يرجى الاتصال بي قبل التوصيل بساعة شكراً",
     status: "pending",
     created_at: "2026-08-14T18:20:00Z"
@@ -222,6 +242,7 @@ export const INITIAL_ORDERS: Order[] = [
     commune: "بئر الجير",
     address: "حي إيسستو بالقرب من الجامعة",
     size: "L",
+    color: "أسود مطرز بالذهبي",
     notes: "تأكيد لون التطريز ذهبي دافئ",
     status: "confirmed",
     created_at: "2026-08-14T14:10:00Z"
@@ -238,6 +259,7 @@ export const INITIAL_ORDERS: Order[] = [
     commune: "الخروب",
     address: "حي 1000 مسكن، الخروب",
     size: "S",
+    color: "بني كشمير",
     notes: "",
     status: "shipped",
     created_at: "2026-08-13T11:45:00Z"
@@ -254,6 +276,7 @@ export const INITIAL_ORDERS: Order[] = [
     commune: "العلمة",
     address: "شارع دبي التجاري",
     size: "One Size",
+    color: "ذهبي",
     notes: "التغليف بكتان الهدية المميز لـ MAISON NB",
     status: "delivered",
     created_at: "2026-08-12T09:30:00Z"

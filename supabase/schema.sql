@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS public.products (
     is_featured BOOLEAN DEFAULT false,
     images TEXT[] DEFAULT '{}',
     sizes TEXT[] DEFAULT '{}',
+    size_type TEXT NOT NULL DEFAULT 'letter' CHECK (size_type IN ('letter', 'number')),
+    colors TEXT[] DEFAULT '{}',
     views INTEGER DEFAULT 0,
     clicks INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now()
@@ -37,6 +39,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     product_name TEXT NOT NULL,
     product_image TEXT NOT NULL,
     size TEXT NOT NULL,
+    color TEXT,
     price NUMERIC NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
