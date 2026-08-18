@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS public.orders (
     size TEXT NOT NULL,
     color TEXT,
     price NUMERIC NOT NULL,
+    delivery_type TEXT NOT NULL DEFAULT 'home' CHECK (delivery_type IN ('home', 'desk')),
+    delivery_price NUMERIC NOT NULL DEFAULT 0,
+    total_price NUMERIC NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 

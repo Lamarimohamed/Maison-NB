@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, CheckCircle2, ShieldCheck, Truck, Phone, MapPin, Sparkles, User, FileText, ShoppingBag, Eye } from "lucide-react";
 import { Product, Order } from "@/data/initialData";
 import { ALGERIA_WILAYAS, getCommunesByWilayaCode } from "@/data/algeriaData";
+import { getShippingRate } from "@/data/shippingRates";
 import { toast } from "sonner";
 
 interface OrderModalProps {
@@ -24,6 +25,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
   const [selectedWilaya, setSelectedWilaya] = useState(ALGERIA_WILAYAS[15].name); // Default 16 - Alger
   const [selectedCommune, setSelectedCommune] = useState("");
   const [communesList, setCommunesList] = useState<string[]>([]);
+  const [deliveryType, setDeliveryType] = useState<"home" | "desk">("home");
   const [address, setAddress] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -66,6 +68,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
 
   if (!isOpen || !product) return null;
 
+  const currentWilaya = ALGERIA_WILAYAS.find((w) => w.name === selectedWilaya);
+  const shippingRate = currentWilaya ? getShippingRate(currentWilaya.code) : null;
+  const deliveryPrice = shippingRate ? (deliveryType === "home" ? shippingRate.home : shippingRate.desk) : 0;
+  const totalPrice = product.price + deliveryPrice;
+
   const validatePhone = (val: string) => {
     const clean = val.trim();
     // Algerian phone format starts with 05, 06, 07, 02 followed by 8 digits
@@ -101,6 +108,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
       return;
     }
 
+    if (!shippingRate) {
+      toast.error("عذراً، التوصيل غير متوفر حالياً لهذه الولاية. يرجى اختيار ولاية أخرى أو التواصل معنا هاتفياً");
+      return;
+    }
+
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -117,6 +129,9 @@ export const OrderModal: React.FC<OrderModalProps> = ({
         address: address.trim(),
         size: selectedSize || product.sizes[0] || "Standard",
         color: selectedColor || undefined,
+        delivery_type: deliveryType,
+        delivery_price: deliveryPrice,
+        total_price: totalPrice,
         notes: notes.trim(),
         status: "pending",
         created_at: new Date().toISOString(),
@@ -183,9 +198,23 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                   <span className="text-[#786F66]">الولاية والبلدية:</span>
                   <span className="font-bold text-[#1F1A17]">{submittedOrder.wilaya} — {submittedOrder.commune}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#786F66]">طريقة التوصيل:</span>
+                  <span className="font-bold text-[#1F1A17]">
+                    {submittedOrder.delivery_type === "home" ? "توصيل للمنزل" : "استلام من المكتب"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#786F66]">سعر المنتج:</span>
+                  <span className="font-bold text-[#1F1A17]">{submittedOrder.price.toLocaleString("fr-DZ")} د.ج</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#786F66]">سعر التوصيل:</span>
+                  <span className="font-bold text-[#1F1A17]">{submittedOrder.delivery_price.toLocaleString("fr-DZ")} د.ج</span>
+                </div>
                 <div className="flex justify-between items-center border-t border-[#B88A44]/20 pt-2 text-sm">
                   <span className="font-bold text-[#1F1A17]">المبلغ الإجمالي (عند الاستلام):</span>
-                  <span className="font-extrabold text-[#B88A44]">{submittedOrder.price.toLocaleString("fr-DZ")} د.ج</span>
+                  <span className="font-extrabold text-[#B88A44]">{submittedOrder.total_price.toLocaleString("fr-DZ")} د.ج</span>
                 </div>
               </div>
 
@@ -227,6 +256,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                   <div className="text-base font-extrabold text-[#B88A44]">
                     {product.price.toLocaleString("fr-DZ")} <span className="text-xs font-normal text-[#1F1A17]">د.ج</span>
                   </div>
+                  {shippingRate && (
+                    <div className="text-[11px] text-[#786F66]">
+                      + توصيل {deliveryPrice.toLocaleString("fr-DZ")} د.ج = <strong className="text-[#1F1A17]">{totalPrice.toLocaleString("fr-DZ")} د.ج</strong>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -314,6 +348,47 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                     </select>
                   </div>
 
+                </div>
+
+                {/* 4b. Delivery Type: Home or Stop Desk */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#1F1A17] flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-[#B88A44]" />
+                    <span>طريقة التوصيل <span className="text-red-500">*</span></span>
+                  </label>
+
+                  {shippingRate ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryType("home")}
+                        className={`p-3 rounded-xl border text-right transition-all ${
+                          deliveryType === "home"
+                            ? "bg-[#1F1A17] text-[#D4AF37] border-[#1F1A17] shadow-md"
+                            : "bg-[#FAF8F5] text-[#1F1A17] border-[#B88A44]/30 hover:bg-[#F3ECE2]"
+                        }`}
+                      >
+                        <div className="text-xs font-bold">توصيل للمنزل</div>
+                        <div className="text-[11px] opacity-80 mt-0.5">{shippingRate.home.toLocaleString("fr-DZ")} د.ج</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryType("desk")}
+                        className={`p-3 rounded-xl border text-right transition-all ${
+                          deliveryType === "desk"
+                            ? "bg-[#1F1A17] text-[#D4AF37] border-[#1F1A17] shadow-md"
+                            : "bg-[#FAF8F5] text-[#1F1A17] border-[#B88A44]/30 hover:bg-[#F3ECE2]"
+                        }`}
+                      >
+                        <div className="text-xs font-bold">استلام من المكتب</div>
+                        <div className="text-[11px] opacity-80 mt-0.5">{shippingRate.desk.toLocaleString("fr-DZ")} د.ج</div>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-[11px] text-red-600">
+                      عذراً، التوصيل غير متوفر حالياً لهذه الولاية. يرجى اختيار ولاية أخرى أو التواصل معنا هاتفياً لترتيب التوصيل.
+                    </div>
+                  )}
                 </div>
 
                 {/* 5. Address Details */}
@@ -406,7 +481,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                 <div className="pt-3">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !shippingRate}
                     className="w-full py-3.5 px-6 bg-gradient-to-r from-[#1F1A17] to-[#362E28] text-[#D4AF37] font-bold rounded-2xl text-sm hover:brightness-125 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? (
@@ -414,7 +489,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                     ) : (
                       <>
                         <ShieldCheck className="w-4 h-4" />
-                        <span>تاكيد وإرسال الطلب الآن ({product.price.toLocaleString("fr-DZ")} د.ج)</span>
+                        <span>تاكيد وإرسال الطلب الآن ({totalPrice.toLocaleString("fr-DZ")} د.ج)</span>
                       </>
                     )}
                   </button>

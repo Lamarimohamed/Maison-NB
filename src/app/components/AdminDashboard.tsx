@@ -659,6 +659,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <div className="font-extrabold text-[#B88A44]">
                             {ord.price.toLocaleString("fr-DZ")} د.ج
                           </div>
+                          <div className="text-[10px] text-[#786F66] leading-relaxed">
+                            <div>
+                              التوصيل: {ord.delivery_type === "home" ? "للمنزل" : "مكتب"} ({ord.delivery_price.toLocaleString("fr-DZ")} د.ج)
+                            </div>
+                            <div className="font-bold text-[#1F1A17]">
+                              الإجمالي: {ord.total_price.toLocaleString("fr-DZ")} د.ج
+                            </div>
+                          </div>
                         </div>
                       </div>
 

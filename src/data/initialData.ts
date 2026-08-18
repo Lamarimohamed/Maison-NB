@@ -37,6 +37,9 @@ export interface Order {
   address: string;
   size: string;
   color?: string;
+  delivery_type: "home" | "desk";
+  delivery_price: number;
+  total_price: number;
   notes?: string;
   status: OrderStatus;
   created_at: string;
@@ -226,6 +229,9 @@ export const INITIAL_ORDERS: Order[] = [
     address: "حي سعيد حمدين، عمارة 12، شقة 4",
     size: "M",
     color: "بيج",
+    delivery_type: "home",
+    delivery_price: 450,
+    total_price: 9350,
     notes: "يرجى الاتصال بي قبل التوصيل بساعة شكراً",
     status: "pending",
     created_at: "2026-08-14T18:20:00Z"
@@ -243,6 +249,9 @@ export const INITIAL_ORDERS: Order[] = [
     address: "حي إيسستو بالقرب من الجامعة",
     size: "L",
     color: "أسود مطرز بالذهبي",
+    delivery_type: "desk",
+    delivery_price: 450,
+    total_price: 12950,
     notes: "تأكيد لون التطريز ذهبي دافئ",
     status: "confirmed",
     created_at: "2026-08-14T14:10:00Z"
@@ -260,6 +269,9 @@ export const INITIAL_ORDERS: Order[] = [
     address: "حي 1000 مسكن، الخروب",
     size: "S",
     color: "بني كشمير",
+    delivery_type: "home",
+    delivery_price: 800,
+    total_price: 17600,
     notes: "",
     status: "shipped",
     created_at: "2026-08-13T11:45:00Z"
@@ -277,6 +289,9 @@ export const INITIAL_ORDERS: Order[] = [
     address: "شارع دبي التجاري",
     size: "One Size",
     color: "ذهبي",
+    delivery_type: "desk",
+    delivery_price: 450,
+    total_price: 10250,
     notes: "التغليف بكتان الهدية المميز لـ MAISON NB",
     status: "delivered",
     created_at: "2026-08-12T09:30:00Z"
